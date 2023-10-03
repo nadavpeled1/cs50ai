@@ -125,9 +125,6 @@ def shortest_path(source, target):
                 child = Node(state=person_id, parent=node, action=movie_id)
                 frontier.add(child)
 
-#            if not frontier.contains_state(state) and state not in explored:
-#                child = Node(state, node, action)
-#               frontier.add(child)
 
 def person_id_for_name(name):
     """
