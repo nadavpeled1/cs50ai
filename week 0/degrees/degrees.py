@@ -112,7 +112,8 @@ def shortest_path(source, target):
             while node.parent is not None:  # add the node and go up in the tree
                 route.append((node.action,node.state))
                 node = node.parent
-            return route.reverse()
+            route.reverse()
+            return route
 
         # Mark node as explored
         explored.add(node.state) # Since its a set,  only added if it's not exist
