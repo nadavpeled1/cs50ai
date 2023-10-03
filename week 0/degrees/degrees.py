@@ -91,10 +91,42 @@ def shortest_path(source, target):
 
     If no possible path, returns None.
     """
+    # we will consider the personas as the states, while the source is the starting state and the goal state the
+    # person we need to reach through connections
+    start = Node(state=source, parent=None, action=None)
+    frontier = QueueFrontier()
+    frontier.add(start)
 
-    # TODO
-    raise NotImplementedError
+    explored = set()
 
+    while True:
+        # If nothing left in frontier, then no solution
+        if frontier.empty():
+            return None
+
+        # pop a node from the frontier
+        node = frontier.remove()
+        # if target reached, go up to the root until reach source to return it
+        if node.state == target:
+            route = []  # the list of tuples to return
+            while node.parent is not None:  # add the node and go up in the tree
+                route.append((node.action,node.state))
+                node = node.parent
+            return route.reverse()
+
+        # Mark node as explored
+        explored.add(node.state) # Since its a set,  only added if it's not exist
+
+        # Add neighbors to frontier
+        for movie_id, person_id in neighbors_for_person(node.state):
+            # if not already explored, and not already in the frontier, add it to the frontier
+            if not frontier.contains_state(person_id) and person_id not in explored:
+                child = Node(state=person_id, parent=node, action=movie_id)
+                frontier.add(child)
+
+#            if not frontier.contains_state(state) and state not in explored:
+#                child = Node(state, node, action)
+#               frontier.add(child)
 
 def person_id_for_name(name):
     """
