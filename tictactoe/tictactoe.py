@@ -49,7 +49,7 @@ def actions(board):
     actions = set()
     for i in range(len(board)):
         for j in range(len(board)):
-            if board[i][j] == 'EMPTY':
+            if board[i][j] == EMPTY:
                 actions.add((i, j))
     return actions
 
