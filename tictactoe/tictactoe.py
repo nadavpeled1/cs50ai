@@ -87,9 +87,12 @@ def terminal(board):
     if winner(board) is not None:
         return True
 
-    if not any(cell == EMPTY for row in board for cell in row):
-        return True
-    return False
+    #if there are no more actions to do, game over
+    return not actions(board)
+
+    # if any(cell == EMPTY for row in board for cell in row):
+    #   return False #theres a place for another action
+    # return True
 
 
 
