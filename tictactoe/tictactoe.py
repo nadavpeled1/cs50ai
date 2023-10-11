@@ -144,9 +144,9 @@ def minimax(board):
         best_action = None
         best_value = math.inf
         for action in actions(board):
-            new_board = result(board, action)
-            value = max_value(new_board)
-            if value < best_value:
+            new_board = result(board,action) # make the current possible action
+            value = max_value(new_board) # check how the adversary plays his max-game
+            if best_value > value:
                 best_value = value
                 best_action = action
         return best_action
