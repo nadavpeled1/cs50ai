@@ -25,8 +25,8 @@ def player(board):
     # we will check if there are more X then O on board,
     # more X = its O turns, else X turn
     # Count the number of X and O on the board
-    count_x = sum(row.count("X") for row in board)
-    count_o = sum(row.count("O") for row in board)
+    count_x = sum(row.count(X) for row in board)
+    count_o = sum(row.count(O) for row in board)
 
     # Check if the game has ended (someone won or the board is full)
     if winner(board) or (count_o + count_x == 9):
@@ -34,9 +34,9 @@ def player(board):
 
     # Determine the next player's turn
     if count_x > count_o:
-        return "O"
+        return O
     else:
-        return "X"
+        return X
 
 def actions(board):
     """
@@ -58,8 +58,11 @@ def result(board, action):
     """
     Returns the board that results from making move (i, j) on the board.
     """
-    board_After = copy.deepcopy(board)
     i, j = action
+    if board[i][j] is not EMPTY:
+        raise Exception("Invalid action: Cell is not EMPTY")
+    #     raise NotImplementedError
+    board_After = copy.deepcopy(board)
     board_After[i][j] = player(board)
     return board_After
 
@@ -69,9 +72,9 @@ def winner(board):
     """
     # rows&cols check:
     for i in range(3):
-        if board[i][0] == board[i][1] == board[i][2]:#row check
+        if board[i][0] == board[i][1] == board[i][2]:# row check
             return board[i][0]
-        elif board[0][i] == board[1][i] == board[2][i]:#col check
+        elif board[0][i] == board[1][i] == board[2][i]:# col check
             return board[0][i]
 
     # diagonal checks
@@ -84,27 +87,52 @@ def terminal(board):
     """
     Returns True if game is over, False otherwise.
     """
-    if winner(board) is not None:
+    if winner(board):
         return True
-
-    #if there are no more actions to do, game over
+    # if no winner and no more possible actions, game is over
     return not actions(board)
-
-    # if any(cell == EMPTY for row in board for cell in row):
-    #   return False #theres a place for another action
-    # return True
-
 
 
 def utility(board):
     """
     Returns 1 if X has won the game, -1 if O has won, 0 otherwise.
     """
-    raise NotImplementedError
+    if terminal(board):
+        if winner(board) == X:
+            return 1
+        if winner(board) == O:
+            return -1
+    return 0
 
+def max_value(board):
+    v = -(math.inf)
+    if terminal(board):
+        return utility(board)
+    for action in actions(board):
+        v = max(v, min_value(result(board,action)))
+    return v
+
+def min_value(board):
+    v = math.inf
+    if terminal(board):
+        return utility(board)
+    for action in actions(board):
+        v = min(v, max_value(result(board, action)))
+    return v
 
 def minimax(board):
     """
     Returns the optimal action for the current player on the board.
     """
-    raise NotImplementedError
+    if terminal(board):
+        return None
+
+    if player(board) == X:
+        for action in actions(board):
+            if max_value(result(board,action)) == max_value(board):
+                return action
+
+    if player(board) == O:
+        for action in actions(board):
+            if min_value(result(board,action)) == min_value(board):
+                return action
