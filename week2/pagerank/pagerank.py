@@ -64,18 +64,18 @@ def transition_model(corpus, page, damping_factor):
     # we define an empty dict that will be the returned prob_dist
     probab_dist = dict()
 
-    #1 - Every page in corpus gets an initial value of :
+    # 1 - Every page in corpus gets an initial value of :
     #   for each pg, dict[pg] = (1/NumOfPages) * (1 - d)
     for pg in corpus:
-        probab_dist[pg] = 1/(len(corpus)) * (1 - damping_factor)
+        probab_dist[pg] = 1 / (len(corpus)) * (1 - damping_factor)
 
-    #2 - Each linked page of the possible links of 'page' add an equal amount of the remain probability to sum to 1
+    # 2 - Each linked page of the possible links of 'page' gets an equal amount of the remain probability to sum to 1
     # which is: d * 1/(numOfPossibleLinks)
-
     for link in corpus[page]:
-        probab_dist[link] += damping_factor * ( 1 / len(corpus[page]))
+        probab_dist[link] += damping_factor * (1 / len(corpus[page]))
 
     return probab_dist
+
 
 def sample_pagerank(corpus, damping_factor, n):
     """
@@ -86,7 +86,26 @@ def sample_pagerank(corpus, damping_factor, n):
     their estimated PageRank value (a value between 0 and 1). All
     PageRank values should sum to 1.
     """
-    raise NotImplementedError
+    # 1 Init a result dict() with the the pages as keys
+    pages_list = list(corpus.keys())
+    page_ranks = dict()
+    for pg in pages_list:  # init rank 0 for each page. Ultimately all will sum up to 1.
+        page_ranks[pg] = 0
+
+    # 2 We random the first page to begin with with random.choice.
+    first_page = random.choice(pages_list)
+    page_ranks[first_page] += (1 / n)  # add the probability for the first random pick
+    next_probab = transition_model(corpus, first_page, damping_factor)
+
+    # 3 we go 'n' times in a loop, randomizing the next link:
+    # Each time, randomizing a page according to the transition model of the current page.
+    # After that, we add a token to the resulted page, and updating the transition model for the next iteration
+    for i in range(n - 1):  # we decrease 1 because we already random the first one
+        current_page = random.choices(list(next_probab.keys()), list(next_probab.values()))[0]
+        page_ranks[current_page] += (1 / n)
+        next_probab = transition_model(corpus, current_page, damping_factor)
+
+    return page_ranks
 
 
 def iterate_pagerank(corpus, damping_factor):
