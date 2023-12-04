@@ -117,7 +117,48 @@ def iterate_pagerank(corpus, damping_factor):
     their estimated PageRank value (a value between 0 and 1). All
     PageRank values should sum to 1.
     """
-    raise NotImplementedError
+    """
+    PR(p) = (1 - d)/N + (d * Sigma_i { PR(i) / NumLinks(i) } )
+    In this formula, d is the damping factor, N is the total number of pages in the corpus,
+    i ranges over all pages that link to page p, and NumLinks(i) is the number of links present on page i.
+    """
+    # 1 - Def. the result dictionary to return, starting each page(key) with 1/N rank
+    pageRanks = dict()
+    pages_list = list(corpus.keys())
+    num_Pages = len(pages_list)
+    for page in pages_list:
+        pageRanks[page] = 1 / num_Pages
+
+    # 2 - Using the iteration method and the formula in the comment, we will fix the pageranks
+    # we need to go-through all pages, and check if they link to the current page.
+    # if so, we need to add rank to the current page according to the linking page PR.
+    # This process should repeat until no PageRank value changes by more than 0.001 between
+    # the current rank values and the new rank values.
+    # Track the changes in each iteration, the stop condition will be all vals of changes are under threshold
+    track_changes = {}
+    threshold = 0.001
+    for page in pages_list:
+        track_changes[page] = threshold + 0.01
+
+    while any(value > threshold for value in track_changes.values()):
+        for current_page_updated in pages_list:
+            sigma = 0
+            for linking_page in pages_list:
+                # go through all pages, check if they link to the current page of we are updating (it's PR)
+                if current_page_updated in corpus[linking_page]:
+                    sigma += pageRanks[linking_page] / len(corpus[linking_page])  # PR(i)/numlink(i)
+                # A page that has no links at all should be interpreted as having one link for every page in the corpus (including itself).
+                elif len(corpus[linking_page]) == 0:
+                    sigma += pageRanks[linking_page] / len(pages_list)
+
+            old_Rank = pageRanks[current_page_updated]
+            new_Rank = ((1 - damping_factor) / num_Pages) + (damping_factor * sigma) # given formula
+
+            change = abs(old_Rank - new_Rank)
+            pageRanks[current_page_updated] = new_Rank
+            track_changes[current_page_updated] = change
+
+    return pageRanks
 
 
 if __name__ == "__main__":
